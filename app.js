@@ -17,15 +17,19 @@ function listenForMessages() {
 
     require('./resources/mockGoogleTranslate').init();
 
-    const [translation] = await translate.translate(data.en, 'fr');
+    const destLanguage = data.en ? "fr" : "en";
+    const sourceText = data.en || data.fr;
+
+    const [translation] = await translate.translate(sourceText, destLanguage);
+
+    const updateObject = {};
+    updateObject[destLanguage] = translation;
 
     await firestoreClient.collection('films').
         doc(data.filmId).
         collection('quotes').
         doc(data.quoteId).
-        update({
-          fr: translation,
-        });
+        update(updateObject);
 
     console.log('processed');
 
